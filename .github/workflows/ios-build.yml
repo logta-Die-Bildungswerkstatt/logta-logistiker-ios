@@ -31,8 +31,8 @@ jobs:
 
       - name: Capacitor sync
         run: |
-          npx cap add ios || true
-          npx cap sync ios
+          ./node_modules/.bin/cap add ios || true
+          ./node_modules/.bin/cap sync ios
 
       - name: Set Build Number
         run: |
