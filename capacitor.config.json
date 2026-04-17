@@ -1,0 +1,17 @@
+{
+  "appId": "com.logta.logistiker",
+  "appName": "LogTa LernApp",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "scheme": "LogTa LernApp",
+    "contentInset": "automatic"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}
