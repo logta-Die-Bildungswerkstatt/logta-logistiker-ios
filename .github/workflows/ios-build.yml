@@ -132,6 +132,12 @@ jobs:
           echo "PP_UUID=$UUID" >> $GITHUB_ENV
           security find-identity -v -p codesigning
 
+      - name: Disable Pods signing
+        run: |
+          cd ios/App
+          sed -i "" "/CODE_SIGNING_REQUIRED/d" Pods/Pods.xcodeproj/project.pbxproj || true
+          find Pods -name "*.xcconfig" -exec sed -i "" "/CODE_SIGN/d" {} \; || true
+
       - name: Build archive (automatisches Signing)
         env:
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
