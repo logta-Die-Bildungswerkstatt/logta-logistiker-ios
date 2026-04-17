@@ -1,0 +1,241 @@
+name: iOS Build & Upload to TestFlight
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Prepare www folder
+        run: |
+          mkdir -p www
+          cp LernappLogistiker.html www/index.html
+          [ -f icon-192.png ] && cp icon-192.png www/ || true
+          [ -f icon-512.png ] && cp icon-512.png www/ || true
+          [ -f sw.js ] && cp sw.js www/ || true
+          [ -f manifest.json ] && cp manifest.json www/ || true
+
+      - name: Capacitor sync
+        run: |
+          npx cap add ios || true
+          npx cap sync ios
+
+      - name: Set Build Number
+        run: |
+          BUILD_NUMBER=${{ github.run_number }}
+          echo "Setting build number to: $BUILD_NUMBER"
+          cd ios/App
+          xcrun agvtool new-version -all $BUILD_NUMBER
+
+      - name: Set Version Number
+        run: |
+          cd ios/App
+          xcrun agvtool new-marketing-version 1.0
+          echo "Version set to 1.0"
+
+      - name: Set App Icon
+        run: |
+          ICON_SRC="AppIcon-1024.png"
+          ICON_DIR="ios/App/App/Assets.xcassets/AppIcon.appiconset"
+          mkdir -p "$ICON_DIR"
+
+          sips -z 20 20     "$ICON_SRC" --out "$ICON_DIR/Icon-20.png"
+          sips -z 40 40     "$ICON_SRC" --out "$ICON_DIR/Icon-20@2x.png"
+          sips -z 60 60     "$ICON_SRC" --out "$ICON_DIR/Icon-20@3x.png"
+          sips -z 29 29     "$ICON_SRC" --out "$ICON_DIR/Icon-29.png"
+          sips -z 58 58     "$ICON_SRC" --out "$ICON_DIR/Icon-29@2x.png"
+          sips -z 87 87     "$ICON_SRC" --out "$ICON_DIR/Icon-29@3x.png"
+          sips -z 40 40     "$ICON_SRC" --out "$ICON_DIR/Icon-40.png"
+          sips -z 80 80     "$ICON_SRC" --out "$ICON_DIR/Icon-40@2x.png"
+          sips -z 120 120   "$ICON_SRC" --out "$ICON_DIR/Icon-40@3x.png"
+          sips -z 120 120   "$ICON_SRC" --out "$ICON_DIR/Icon-60@2x.png"
+          sips -z 180 180   "$ICON_SRC" --out "$ICON_DIR/Icon-60@3x.png"
+          sips -z 76 76     "$ICON_SRC" --out "$ICON_DIR/Icon-76.png"
+          sips -z 152 152   "$ICON_SRC" --out "$ICON_DIR/Icon-76@2x.png"
+          sips -z 167 167   "$ICON_SRC" --out "$ICON_DIR/Icon-83.5@2x.png"
+          sips -z 1024 1024 "$ICON_SRC" --out "$ICON_DIR/Icon-1024.png"
+
+          cat > "$ICON_DIR/Contents.json" << 'CONTENTS'
+          {
+            "images": [
+              {"idiom":"iphone","scale":"2x","size":"20x20","filename":"Icon-20@2x.png"},
+              {"idiom":"iphone","scale":"3x","size":"20x20","filename":"Icon-20@3x.png"},
+              {"idiom":"iphone","scale":"2x","size":"29x29","filename":"Icon-29@2x.png"},
+              {"idiom":"iphone","scale":"3x","size":"29x29","filename":"Icon-29@3x.png"},
+              {"idiom":"iphone","scale":"2x","size":"40x40","filename":"Icon-40@2x.png"},
+              {"idiom":"iphone","scale":"3x","size":"40x40","filename":"Icon-40@3x.png"},
+              {"idiom":"iphone","scale":"2x","size":"60x60","filename":"Icon-60@2x.png"},
+              {"idiom":"iphone","scale":"3x","size":"60x60","filename":"Icon-60@3x.png"},
+              {"idiom":"ipad","scale":"1x","size":"20x20","filename":"Icon-20.png"},
+              {"idiom":"ipad","scale":"2x","size":"20x20","filename":"Icon-20@2x.png"},
+              {"idiom":"ipad","scale":"1x","size":"29x29","filename":"Icon-29.png"},
+              {"idiom":"ipad","scale":"2x","size":"29x29","filename":"Icon-29@2x.png"},
+              {"idiom":"ipad","scale":"1x","size":"40x40","filename":"Icon-40.png"},
+              {"idiom":"ipad","scale":"2x","size":"40x40","filename":"Icon-40@2x.png"},
+              {"idiom":"ipad","scale":"1x","size":"76x76","filename":"Icon-76.png"},
+              {"idiom":"ipad","scale":"2x","size":"76x76","filename":"Icon-76@2x.png"},
+              {"idiom":"ipad","scale":"2x","size":"83.5x83.5","filename":"Icon-83.5@2x.png"},
+              {"idiom":"ios-marketing","scale":"1x","size":"1024x1024","filename":"Icon-1024.png"}
+            ],
+            "info": {"author":"xcode","version":1}
+          }
+          CONTENTS
+          echo "Icons gesetzt!"
+
+      - name: Install CocoaPods
+        run: |
+          cd ios/App
+          pod install --repo-update
+
+      - name: Setup App Store Connect API Key
+        env:
+          API_KEY_BASE64: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+        run: |
+          mkdir -p ~/private_keys
+          echo -n "$API_KEY_BASE64" | base64 --decode > ~/private_keys/AuthKey_${API_KEY_ID}.p8
+          ls -la ~/private_keys/
+
+      - name: Install signing certificate
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+          echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          UUID=$(security cms -D -i $PP_PATH | plutil -extract UUID raw -)
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+          echo "PP_UUID=$UUID" >> $GITHUB_ENV
+          echo "Installed profile UUID: $UUID"
+          security find-identity -v -p codesigning
+
+      - name: Create Pods xcconfig to disable signing
+        run: |
+          cat > /tmp/PodsSigning.xcconfig << 'EOF'
+          CODE_SIGNING_REQUIRED = NO
+          CODE_SIGNING_ALLOWED = NO
+          CODE_SIGN_IDENTITY =
+          PROVISIONING_PROFILE_SPECIFIER =
+          PROVISIONING_PROFILE =
+          EOF
+
+      - name: Build archive
+        env:
+          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          cd ios/App
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -archivePath $RUNNER_TEMP/App.xcarchive \
+            archive \
+            -destination "generic/platform=iOS" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_${API_KEY_ID}.p8 \
+            -authenticationKeyID "$API_KEY_ID" \
+            -authenticationKeyIssuerID "$API_ISSUER_ID" \
+            DEVELOPMENT_TEAM=LLS24XJ89S \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE="$PP_UUID" \
+            OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
+            -xcconfig /tmp/PodsSigning.xcconfig 2>&1 | grep -v "^note:" | grep -v "^warning:"
+
+      - name: Verify archive
+        run: |
+          echo "=== Archive size ==="
+          du -sh $RUNNER_TEMP/App.xcarchive
+          echo "=== Archive contents ==="
+          ls -la "$RUNNER_TEMP/App.xcarchive/Products/Applications/" || echo "No Applications folder!"
+
+      - name: Create ExportOptions.plist
+        run: |
+          cat > $RUNNER_TEMP/ExportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>teamID</key>
+            <string>LLS24XJ89S</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.logta.logistiker</key>
+              <string>LogTa_Logistiker_AppStore</string>
+            </dict>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>stripSwiftSymbols</key>
+            <true/>
+            <key>uploadSymbols</key>
+            <true/>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Export IPA
+        env:
+          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath $RUNNER_TEMP/App.xcarchive \
+            -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
+            -exportPath $RUNNER_TEMP/export \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_${API_KEY_ID}.p8 \
+            -authenticationKeyID "$API_KEY_ID" \
+            -authenticationKeyIssuerID "$API_ISSUER_ID"
+          echo "=== Exported files ==="
+          ls -lah $RUNNER_TEMP/export/
+
+      - name: Upload to TestFlight
+        env:
+          API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          IPA_PATH=$(find $RUNNER_TEMP/export -name "*.ipa" | head -1)
+          echo "Uploading: $IPA_PATH ($(du -sh $IPA_PATH | cut -f1))"
+          xcrun altool --upload-app \
+            --type ios \
+            --file "$IPA_PATH" \
+            --apiKey "$API_KEY_ID" \
+            --apiIssuer "$API_ISSUER_ID" \
+            --verbose
+
+      - name: Upload IPA as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogTa-Logistiker-IPA
+          path: ${{ runner.temp }}/export/*.ipa
+          retention-days: 30
