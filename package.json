@@ -1,16 +1,17 @@
 {
-  "name": "logta-logistiker",
-  "version": "1.0.0",
-  "description": "LogTa Lernapp Logistiker",
-  "main": "index.js",
-  "scripts": {
-    "build": "echo 'Static HTML app - no build needed'"
+  "appId": "com.logta.logistiker",
+  "appName": "LogTa LernApp",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
   },
-  "dependencies": {
-    "@capacitor/core": "^6.0.0",
-    "@capacitor/ios": "^6.0.0"
+  "ios": {
+    "scheme": "LogTa LernApp",
+    "contentInset": "automatic"
   },
-  "devDependencies": {
-    "@capacitor/cli": "^6.0.0"
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
   }
 }
