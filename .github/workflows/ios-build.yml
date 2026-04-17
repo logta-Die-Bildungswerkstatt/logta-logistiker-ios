@@ -132,6 +132,16 @@ jobs:
           echo "PP_UUID=$UUID" >> $GITHUB_ENV
           security find-identity -v -p codesigning
 
+      - name: Create Pods signing xcconfig
+        run: |
+          cat > /tmp/PodsSigning.xcconfig << EOF
+          CODE_SIGNING_REQUIRED = NO
+          CODE_SIGNING_ALLOWED = NO
+          CODE_SIGN_IDENTITY =
+          PROVISIONING_PROFILE_SPECIFIER =
+          PROVISIONING_PROFILE =
+          EOF
+
       - name: Disable Pods signing
         run: |
           cd ios/App
@@ -160,6 +170,7 @@ jobs:
             CODE_SIGN_IDENTITY="Apple Distribution" \
             PROVISIONING_PROFILE="$PP_UUID" \
             OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
+            -xcconfig /tmp/PodsSigning.xcconfig \
             2>&1 | grep -v "^note:" | grep -v "^warning:"
 
       - name: Create ExportOptions.plist
