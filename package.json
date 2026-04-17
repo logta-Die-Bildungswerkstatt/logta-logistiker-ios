@@ -1,0 +1,16 @@
+{
+  "name": "logta-logistiker",
+  "version": "1.0.0",
+  "description": "LogTa Lernapp Logistiker",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'Static HTML app - no build needed'"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/ios": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  }
+}
