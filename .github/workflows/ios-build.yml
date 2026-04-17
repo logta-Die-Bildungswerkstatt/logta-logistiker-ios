@@ -20,9 +20,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install Capacitor CLI globally
-        run: npm install -g @capacitor/cli
-
       - name: Prepare www folder
         run: |
           mkdir -p www
@@ -55,7 +52,6 @@ jobs:
           ICON_SRC="AppIcon-1024.png"
           ICON_DIR="ios/App/App/Assets.xcassets/AppIcon.appiconset"
           mkdir -p "$ICON_DIR"
-
           sips -z 20 20     "$ICON_SRC" --out "$ICON_DIR/Icon-20.png"
           sips -z 40 40     "$ICON_SRC" --out "$ICON_DIR/Icon-20@2x.png"
           sips -z 60 60     "$ICON_SRC" --out "$ICON_DIR/Icon-20@3x.png"
@@ -71,7 +67,6 @@ jobs:
           sips -z 152 152   "$ICON_SRC" --out "$ICON_DIR/Icon-76@2x.png"
           sips -z 167 167   "$ICON_SRC" --out "$ICON_DIR/Icon-83.5@2x.png"
           sips -z 1024 1024 "$ICON_SRC" --out "$ICON_DIR/Icon-1024.png"
-
           cat > "$ICON_DIR/Contents.json" << 'CONTENTS'
           {
             "images": [
