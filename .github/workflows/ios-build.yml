@@ -34,18 +34,42 @@ jobs:
           npx cap add ios || true
           npx cap sync ios
 
+      - name: Show Swift files for debugging
+        run: |
+          echo "=== Alle Swift-Dateien ==="
+          find ios/App -name "*.swift"
+          echo "=== AppDelegate.swift ==="
+          cat ios/App/App/AppDelegate.swift
+
+      - name: Inject IAP Swift Code
+        run: |
+          echo "aW1wb3J0IEZvdW5kYXRpb24KaW1wb3J0IFN0b3JlS2l0CmltcG9ydCBXZWJLaXQKCmNsYXNzIElBUE1hbmFnZXI6IE5TT2JqZWN0LCBTS1Byb2R1Y3RzUmVxdWVzdERlbGVnYXRlLCBTS1BheW1lbnRUcmFuc2FjdGlvbk9ic2VydmVyIHsKICAgIHN0YXRpYyBsZXQgc2hhcmVkID0gSUFQTWFuYWdlcigpCiAgICB3ZWFrIHZhciB3ZWJWaWV3OiBXS1dlYlZpZXc/CiAgICBvdmVycmlkZSBpbml0KCkgewogICAgICAgIHN1cGVyLmluaXQoKQogICAgICAgIFNLUGF5bWVudFF1ZXVlLmRlZmF1bHQoKS5hZGQoc2VsZikKICAgIH0KICAgIGZ1bmMgcHVyY2hhc2UocHJvZHVjdElkOiBTdHJpbmcpIHsKICAgICAgICBsZXQgcmVxdWVzdCA9IFNLUHJvZHVjdHNSZXF1ZXN0KHByb2R1Y3RJZGVudGlmaWVyczogW3Byb2R1Y3RJZF0pCiAgICAgICAgcmVxdWVzdC5kZWxlZ2F0ZSA9IHNlbGYKICAgICAgICByZXF1ZXN0LnN0YXJ0KCkKICAgIH0KICAgIGZ1bmMgcmVzdG9yZSgpIHsKICAgICAgICBTS1BheW1lbnRRdWV1ZS5kZWZhdWx0KCkucmVzdG9yZUNvbXBsZXRlZFRyYW5zYWN0aW9ucygpCiAgICB9CiAgICBmdW5jIHByb2R1Y3RzUmVxdWVzdChfIHJlcXVlc3Q6IFNLUHJvZHVjdHNSZXF1ZXN0LCBkaWRSZWNlaXZlIHJlc3BvbnNlOiBTS1Byb2R1Y3RzUmVzcG9uc2UpIHsKICAgICAgICBndWFyZCBsZXQgcHJvZHVjdCA9IHJlc3BvbnNlLnByb2R1Y3RzLmZpcnN0IGVsc2UgewogICAgICAgICAgICBjYWxsSlMoIndpbmRvdy5vbklBUEVycm9yKFwiUHJvZHVrdCBuaWNodCBnZWZ1bmRlbi5cIikiKQogICAgICAgICAgICByZXR1cm4KICAgICAgICB9CiAgICAgICAgU0tQYXltZW50UXVldWUuZGVmYXVsdCgpLmFkZChTS1BheW1lbnQocHJvZHVjdDogcHJvZHVjdCkpCiAgICB9CiAgICBmdW5jIHJlcXVlc3QoXyByZXF1ZXN0OiBTS1JlcXVlc3QsIGRpZEZhaWxXaXRoRXJyb3IgZXJyb3I6IEVycm9yKSB7CiAgICAgICAgY2FsbEpTKCJ3aW5kb3cub25JQVBFcnJvcihcIlwoZXJyb3IubG9jYWxpemVkRGVzY3JpcHRpb24pXCIpIikKICAgIH0KICAgIGZ1bmMgcGF5bWVudFF1ZXVlKF8gcXVldWU6IFNLUGF5bWVudFF1ZXVlLCB1cGRhdGVkVHJhbnNhY3Rpb25zIHRyYW5zYWN0aW9uczogW1NLUGF5bWVudFRyYW5zYWN0aW9uXSkgewogICAgICAgIGZvciB0cmFuc2FjdGlvbiBpbiB0cmFuc2FjdGlvbnMgewogICAgICAgICAgICBzd2l0Y2ggdHJhbnNhY3Rpb24udHJhbnNhY3Rpb25TdGF0ZSB7CiAgICAgICAgICAgIGNhc2UgLnB1cmNoYXNlZDoKICAgICAgICAgICAgICAgIFNLUGF5bWVudFF1ZXVlLmRlZmF1bHQoKS5maW5pc2hUcmFuc2FjdGlvbih0cmFuc2FjdGlvbikKICAgICAgICAgICAgICAgIGNhbGxKUygid2luZG93Lm9uSUFQU3VjY2VzcygpIikKICAgICAgICAgICAgY2FzZSAucmVzdG9yZWQ6CiAgICAgICAgICAgICAgICBTS1BheW1lbnRRdWV1ZS5kZWZhdWx0KCkuZmluaXNoVHJhbnNhY3Rpb24odHJhbnNhY3Rpb24pCiAgICAgICAgICAgICAgICBjYWxsSlMoIndpbmRvdy5vbklBUFJlc3RvcmVTdWNjZXNzKCkiKQogICAgICAgICAgICBjYXNlIC5mYWlsZWQ6CiAgICAgICAgICAgICAgICBTS1BheW1lbnRRdWV1ZS5kZWZhdWx0KCkuZmluaXNoVHJhbnNhY3Rpb24odHJhbnNhY3Rpb24pCiAgICAgICAgICAgICAgICBsZXQgbXNnID0gKHRyYW5zYWN0aW9uLmVycm9yIGFzPyBTS0Vycm9yKT8uY29kZSA9PSAucGF5bWVudENhbmNlbGxlZCA/ICJLYXVmIGFiZ2Vicm9jaGVuLiIgOiAodHJhbnNhY3Rpb24uZXJyb3I/LmxvY2FsaXplZERlc2NyaXB0aW9uID8/ICJGZWhsZXIiKQogICAgICAgICAgICAgICAgY2FsbEpTKCJ3aW5kb3cub25JQVBFcnJvcihcIlwobXNnKVwiKSIpCiAgICAgICAgICAgIGRlZmF1bHQ6CiAgICAgICAgICAgICAgICBicmVhawogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQogICAgZnVuYyBwYXltZW50UXVldWVSZXN0b3JlQ29tcGxldGVkVHJhbnNhY3Rpb25zRmluaXNoZWQoXyBxdWV1ZTogU0tQYXltZW50UXVldWUpIHsKICAgICAgICBpZiBxdWV1ZS50cmFuc2FjdGlvbnMuZmlsdGVyKHsgJDAudHJhbnNhY3Rpb25TdGF0ZSA9PSAucmVzdG9yZWQgfSkuaXNFbXB0eSB7CiAgICAgICAgICAgIGNhbGxKUygid2luZG93Lm9uSUFQUmVzdG9yZUVtcHR5KCkiKQogICAgICAgIH0KICAgIH0KICAgIGZ1bmMgcGF5bWVudFF1ZXVlKF8gcXVldWU6IFNLUGF5bWVudFF1ZXVlLCByZXN0b3JlQ29tcGxldGVkVHJhbnNhY3Rpb25zRmFpbGVkV2l0aEVycm9yIGVycm9yOiBFcnJvcikgewogICAgICAgIGNhbGxKUygid2luZG93Lm9uSUFQRXJyb3IoXCJcKGVycm9yLmxvY2FsaXplZERlc2NyaXB0aW9uKVwiKSIpCiAgICB9CiAgICBwcml2YXRlIGZ1bmMgY2FsbEpTKF8gc2NyaXB0OiBTdHJpbmcpIHsKICAgICAgICBEaXNwYXRjaFF1ZXVlLm1haW4uYXN5bmMgeyBzZWxmLndlYlZpZXc/LmV2YWx1YXRlSmF2YVNjcmlwdChzY3JpcHQsIGNvbXBsZXRpb25IYW5kbGVyOiBuaWwpIH0KICAgIH0KfQpjbGFzcyBJQVBQdXJjaGFzZUhhbmRsZXI6IE5TT2JqZWN0LCBXS1NjcmlwdE1lc3NhZ2VIYW5kbGVyIHsKICAgIGZ1bmMgdXNlckNvbnRlbnRDb250cm9sbGVyKF8gdXNlckNvbnRlbnRDb250cm9sbGVyOiBXS1VzZXJDb250ZW50Q29udHJvbGxlciwgZGlkUmVjZWl2ZSBtZXNzYWdlOiBXS1NjcmlwdE1lc3NhZ2UpIHsKICAgICAgICBpZiBsZXQgYm9keSA9IG1lc3NhZ2UuYm9keSBhcz8gW1N0cmluZzogQW55XSwgbGV0IHByb2R1Y3RJZCA9IGJvZHlbInByb2R1Y3RJZCJdIGFzPyBTdHJpbmcgewogICAgICAgICAgICBJQVBNYW5hZ2VyLnNoYXJlZC5wdXJjaGFzZShwcm9kdWN0SWQ6IHByb2R1Y3RJZCkKICAgICAgICB9CiAgICB9Cn0KY2xhc3MgSUFQUmVzdG9yZUhhbmRsZXI6IE5TT2JqZWN0LCBXS1NjcmlwdE1lc3NhZ2VIYW5kbGVyIHsKICAgIGZ1bmMgdXNlckNvbnRlbnRDb250cm9sbGVyKF8gdXNlckNvbnRlbnRDb250cm9sbGVyOiBXS1VzZXJDb250ZW50Q29udHJvbGxlciwgZGlkUmVjZWl2ZSBtZXNzYWdlOiBXS1NjcmlwdE1lc3NhZ2UpIHsKICAgICAgICBJQVBNYW5hZ2VyLnNoYXJlZC5yZXN0b3JlKCkKICAgIH0KfQo=" | base64 --decode > ios/App/App/IAPManager.swift
+          echo "IAPManager.swift erstellt"
+
+      - name: Patch AppDelegate to register IAP handlers
+        run: |
+          echo "aW1wb3J0IHN5cwppbXBvcnQgb3MKCnBhdGggPSAiaW9zL0FwcC9BcHAvQXBwRGVsZWdhdGUuc3dpZnQiCndpdGggb3BlbihwYXRoLCAiciIpIGFzIGY6CiAgICBjb250ZW50ID0gZi5yZWFkKCkKCnByaW50KCI9PT0gT3JpZ2luYWwgQXBwRGVsZWdhdGUuc3dpZnQgPT09IikKcHJpbnQoY29udGVudCkKCiMgQ2hlY2sgb2IgYmVyZWl0cyBnZXBhdGNodCAtIHdlbm4gamEsIGNsZWFuZXMgZXJzdG1hbAppZiAiSUFQQnJpZGdlIiBpbiBjb250ZW50IG9yICJpYXBQdXJjaGFzZSIgaW4gY29udGVudDoKICAgIHByaW50KCJJQVAgYmVyZWl0cyB2b3JoYW5kZW4gLSB3aXJkIGVyc2V0enQiKQogICAgIyBFbnRmZXJuZSBhbHRlbiBQYXRjaCB6d2lzY2hlbiBNYXJrZXJzCiAgICBpbXBvcnQgcmUKICAgIGNvbnRlbnQgPSByZS5zdWIocidcblxzKi8vIElBUCBCcmlkZ2UuKj8oPz1cblxzKnJldHVybiB0cnVlKScsICcnLCBjb250ZW50LCBmbGFncz1yZS5ET1RBTEwpCiAgICBjb250ZW50ID0gcmUuc3ViKHInXG5ccyovLyBJQVBCcmlkZ2UuKj8vLyBJQVBCcmlkZ2UgRU5EXG4nLCAnXG4nLCBjb250ZW50LCBmbGFncz1yZS5ET1RBTEwpCgojIFJvYnVzdGVyIElBUC1Db2RlIG1pdCBSZXRyeS1Mb2dpYyB1bmQgQ2FwYWNpdG9yLUV4dGVuc2lvbgppYXBfY29kZSA9ICcnJwogICAgICAgIC8vIElBUEJyaWRnZSBTVEFSVCAtIFJvYnVzdCByZWdpc3RyYXRpb24gdmlhIENhcGFjaXRvciBub3RpZmljYXRpb24KICAgICAgICBOb3RpZmljYXRpb25DZW50ZXIuZGVmYXVsdC5hZGRPYnNlcnZlcigKICAgICAgICAgICAgZm9yTmFtZTogTm90aWZpY2F0aW9uLk5hbWUuY2FwYWNpdG9yRGVjaWRlUG9saWN5Rm9yTmF2aWdhdGlvbkFjdGlvbiwKICAgICAgICAgICAgb2JqZWN0OiBuaWwsIHF1ZXVlOiAubWFpbgogICAgICAgICkgeyBfIGluCiAgICAgICAgICAgIElBUEJyaWRnZS5zaGFyZWQucmVnaXN0ZXJJZk5lZWRlZCh3aW5kb3c6IHNlbGYud2luZG93KQogICAgICAgIH0KICAgICAgICAvLyBadXNhZXR6bGljaDogUmV0cnktTG9naWMgZmFsbHMgTm90aWZpY2F0aW9uIG5pY2h0IGZldWVydAogICAgICAgIElBUEJyaWRnZS5zaGFyZWQuc2NoZWR1bGVSZWdpc3RyYXRpb24od2luZG93OiBzZWxmLndpbmRvdykKICAgICAgICAvLyBJQVBCcmlkZ2UgRU5ECicnJwoKaWYgImltcG9ydCBXZWJLaXQiIG5vdCBpbiBjb250ZW50OgogICAgY29udGVudCA9IGNvbnRlbnQucmVwbGFjZSgiaW1wb3J0IFVJS2l0IiwgImltcG9ydCBVSUtpdFxuaW1wb3J0IFdlYktpdCIsIDEpCgppZiAicmV0dXJuIHRydWUiIGluIGNvbnRlbnQ6CiAgICBjb250ZW50ID0gY29udGVudC5yZXBsYWNlKCJyZXR1cm4gdHJ1ZSIsIGlhcF9jb2RlICsgIlxuICAgICAgICByZXR1cm4gdHJ1ZSIsIDEpCiAgICBwcmludCgiSUFQIEJyaWRnZSBjb2RlIGVpbmdlZnVlZ3QgaW4gQXBwRGVsZWdhdGUiKQplbHNlOgogICAgcHJpbnQoIkZFSExFUjogcmV0dXJuIHRydWUgbmljaHQgZ2VmdW5kZW4hIikKICAgIHByaW50KGNvbnRlbnQpCiAgICBzeXMuZXhpdCgxKQoKIyBJQVBCcmlkZ2UtS2xhc3NlIGFucyBFbmRlIGRlciBEYXRlaSBhbmhhZW5nZW4gKHNlcGFyYXRlIEtsYXNzZSwgc2F1YmVyKQpicmlkZ2VfY2xhc3MgPSAnJycKCi8vID09PT09IElBUCBCUklER0UgPT09PT0KLy8gUm9idXN0ZSBIYW5kbGVyLVJlZ2lzdHJpZXJ1bmcgZnVlciBDYXBhY2l0b3IgV2ViVmlldwovLyBWZXJ3ZW5kZXQgbWVocmVyZSBTdHJhdGVnaWVuIGRhbWl0IGRpZSBXZWJWaWV3IGdhcmFudGllcnQgZ2VmdW5kZW4gd2lyZApjbGFzcyBJQVBCcmlkZ2UgewogICAgc3RhdGljIGxldCBzaGFyZWQgPSBJQVBCcmlkZ2UoKQogICAgcHJpdmF0ZSB2YXIgcmVnaXN0ZXJlZCA9IGZhbHNlCiAgICBwcml2YXRlIHZhciByZXRyeUNvdW50ID0gMAogICAgcHJpdmF0ZSBsZXQgbWF4UmV0cmllcyA9IDIwICAvLyAyMCBWZXJzdWNoZSB4IDAuNXMgPSAxMCBTZWt1bmRlbgoKICAgIHByaXZhdGUgaW5pdCgpIHt9CgogICAgZnVuYyBzY2hlZHVsZVJlZ2lzdHJhdGlvbih3aW5kb3c6IFVJV2luZG93PykgewogICAgICAgIGF0dGVtcHRSZWdpc3RyYXRpb24od2luZG93OiB3aW5kb3cpCiAgICB9CgogICAgZnVuYyByZWdpc3RlcklmTmVlZGVkKHdpbmRvdzogVUlXaW5kb3c/KSB7CiAgICAgICAgaWYgIXJlZ2lzdGVyZWQgewogICAgICAgICAgICBhdHRlbXB0UmVnaXN0cmF0aW9uKHdpbmRvdzogd2luZG93KQogICAgICAgIH0KICAgIH0KCiAgICBwcml2YXRlIGZ1bmMgYXR0ZW1wdFJlZ2lzdHJhdGlvbih3aW5kb3c6IFVJV2luZG93PykgewogICAgICAgIGlmIHJlZ2lzdGVyZWQgeyByZXR1cm4gfQogICAgICAgIHJldHJ5Q291bnQgKz0gMQoKICAgICAgICBndWFyZCBsZXQgdyA9IHdpbmRvdywKICAgICAgICAgICAgICBsZXQgcm9vdFZDID0gdy5yb290Vmlld0NvbnRyb2xsZXIsCiAgICAgICAgICAgICAgbGV0IHdlYlZpZXcgPSBmaW5kV2ViVmlldyhpbjogcm9vdFZDLnZpZXcpIGVsc2UgewogICAgICAgICAgICAvLyBXZWJWaWV3IG5vY2ggbmljaHQgZGEgLSBub2NobWFsIHByb2JpZXJlbgogICAgICAgICAgICBpZiByZXRyeUNvdW50IDwgbWF4UmV0cmllcyB7CiAgICAgICAgICAgICAgICBEaXNwYXRjaFF1ZXVlLm1haW4uYXN5bmNBZnRlcihkZWFkbGluZTogLm5vdygpICsgMC41KSB7IFt3ZWFrIHNlbGZdIGluCiAgICAgICAgICAgICAgICAgICAgc2VsZj8uYXR0ZW1wdFJlZ2lzdHJhdGlvbih3aW5kb3c6IHdpbmRvdykKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgICAgIHByaW50KCJJQVBCcmlkZ2U6IFdlYlZpZXcgbmFjaCBcXChtYXhSZXRyaWVzKSBWZXJzdWNoZW4gbmljaHQgZ2VmdW5kZW4iKQogICAgICAgICAgICB9CiAgICAgICAgICAgIHJldHVybgogICAgICAgIH0KCiAgICAgICAgLy8gV2ViVmlldyBnZWZ1bmRlbiAtIEhhbmRsZXIgcmVnaXN0cmllcmVuCiAgICAgICAgbGV0IHVjYyA9IHdlYlZpZXcuY29uZmlndXJhdGlvbi51c2VyQ29udGVudENvbnRyb2xsZXIKICAgICAgICAvLyBFcnN0IGFsdGUgSGFuZGxlciBlbnRmZXJuZW4gZmFsbHMgdm9yaGFuZGVuIChzaWNoZXIgaXN0IHNpY2hlcikKICAgICAgICB1Y2MucmVtb3ZlU2NyaXB0TWVzc2FnZUhhbmRsZXIoZm9yTmFtZTogImlhcFB1cmNoYXNlIikKICAgICAgICB1Y2MucmVtb3ZlU2NyaXB0TWVzc2FnZUhhbmRsZXIoZm9yTmFtZTogImlhcFJlc3RvcmUiKQogICAgICAgIC8vIE5ldWUgSGFuZGxlcgogICAgICAgIHVjYy5hZGQoSUFQUHVyY2hhc2VIYW5kbGVyKCksIG5hbWU6ICJpYXBQdXJjaGFzZSIpCiAgICAgICAgdWNjLmFkZChJQVBSZXN0b3JlSGFuZGxlcigpLCBuYW1lOiAiaWFwUmVzdG9yZSIpCiAgICAgICAgSUFQTWFuYWdlci5zaGFyZWQud2ViVmlldyA9IHdlYlZpZXcKICAgICAgICByZWdpc3RlcmVkID0gdHJ1ZQogICAgICAgIHByaW50KCJJQVBCcmlkZ2U6IEhhbmRsZXIgZXJmb2xncmVpY2ggcmVnaXN0cmllcnQgbmFjaCBcXChyZXRyeUNvdW50KSBWZXJzdWNoKGVuKSIpCiAgICB9CgogICAgcHJpdmF0ZSBmdW5jIGZpbmRXZWJWaWV3KGluIHZpZXc6IFVJVmlldykgLT4gV0tXZWJWaWV3PyB7CiAgICAgICAgaWYgbGV0IHd2ID0gdmlldyBhcz8gV0tXZWJWaWV3IHsgcmV0dXJuIHd2IH0KICAgICAgICBmb3Igc3ViIGluIHZpZXcuc3Vidmlld3MgewogICAgICAgICAgICBpZiBsZXQgZm91bmQgPSBmaW5kV2ViVmlldyhpbjogc3ViKSB7IHJldHVybiBmb3VuZCB9CiAgICAgICAgfQogICAgICAgIHJldHVybiBuaWwKICAgIH0KfQoKZXh0ZW5zaW9uIE5vdGlmaWNhdGlvbi5OYW1lIHsKICAgIHN0YXRpYyBsZXQgY2FwYWNpdG9yRGVjaWRlUG9saWN5Rm9yTmF2aWdhdGlvbkFjdGlvbiA9CiAgICAgICAgTm90aWZpY2F0aW9uLk5hbWUoImNhcGFjaXRvckRlY2lkZVBvbGljeUZvck5hdmlnYXRpb25BY3Rpb24iKQp9CicnJwoKY29udGVudCA9IGNvbnRlbnQucnN0cmlwKCkgKyBicmlkZ2VfY2xhc3MgKyAiXG4iCgp3aXRoIG9wZW4ocGF0aCwgInciKSBhcyBmOgogICAgZi53cml0ZShjb250ZW50KQoKcHJpbnQoIj09PSBHZXBhdGNodGVzIEFwcERlbGVnYXRlLnN3aWZ0ID09PSIpCndpdGggb3BlbihwYXRoKSBhcyBmOgogICAgcHJpbnQoZi5yZWFkKCkpCg==" | base64 --decode > /tmp/patch_appdelegate.py
+          python3 /tmp/patch_appdelegate.py
+
+      - name: Add IAPManager to Xcode project
+        run: |
+          echo "aW1wb3J0IHJlLCBzeXMKCnBieHByb2ogPSAiaW9zL0FwcC9BcHAueGNvZGVwcm9qL3Byb2plY3QucGJ4cHJvaiIKd2l0aCBvcGVuKHBieHByb2osICJyIikgYXMgZjoKICAgIGNvbnRlbnQgPSBmLnJlYWQoKQoKaWYgIklBUE1hbmFnZXIuc3dpZnQiIGluIGNvbnRlbnQ6CiAgICBwcmludCgiQmVyZWl0cyBpbSBQcm9qZWt0IikKICAgIHN5cy5leGl0KDApCgpyZWZfdXVpZCAgID0gIkFBMDAwMDAxMDAwMDAwMDAwMDAwMDAxQSIKYnVpbGRfdXVpZCA9ICJBQTAwMDAwMTAwMDAwMDAwMDAwMDAwMUIiCgpidWlsZF9lbnRyeSA9ICJcdFx0IiArIGJ1aWxkX3V1aWQgKyAiIC8qIElBUE1hbmFnZXIuc3dpZnQgaW4gU291cmNlcyAqLyA9IHtpc2EgPSBQQlhCdWlsZEZpbGU7IGZpbGVSZWYgPSAiICsgcmVmX3V1aWQgKyAiIC8qIElBUE1hbmFnZXIuc3dpZnQgKi87IH07XG4iCmZpbGVfZW50cnkgID0gIlx0XHQiICsgcmVmX3V1aWQgKyAiIC8qIElBUE1hbmFnZXIuc3dpZnQgKi8gPSB7aXNhID0gUEJYRmlsZVJlZmVyZW5jZTsgbGFzdEtub3duRmlsZVR5cGUgPSBzb3VyY2Vjb2RlLnN3aWZ0OyBwYXRoID0gSUFQTWFuYWdlci5zd2lmdDsgc291cmNlVHJlZSA9IFwiPGdyb3VwPlwiOyB9O1xuIgoKY29udGVudCA9IHJlLnN1YihyIigvXCogQmVnaW4gUEJYQnVpbGRGaWxlIHNlY3Rpb24gXCovXG4pIiwgciJcMSIgKyBidWlsZF9lbnRyeSwgY29udGVudCkKY29udGVudCA9IHJlLnN1YihyIigvXCogQmVnaW4gUEJYRmlsZVJlZmVyZW5jZSBzZWN0aW9uIFwqL1xuKSIsIHIiXDEiICsgZmlsZV9lbnRyeSwgY29udGVudCkKY29udGVudCA9IHJlLnN1YihyIihBcHBEZWxlZ2F0ZVwuc3dpZnQgXCovLFxuKSIsIHIiXDFcdFx0XHRcdCIgKyByZWZfdXVpZCArICIgLyogSUFQTWFuYWdlci5zd2lmdCAqLyxcbiIsIGNvbnRlbnQpCmNvbnRlbnQgPSByZS5zdWIociIoQXBwRGVsZWdhdGVcLnN3aWZ0IGluIFNvdXJjZXMgXCovLFxuKSIsIHIiXDFcdFx0XHRcdCIgKyBidWlsZF91dWlkICsgIiAvKiBJQVBNYW5hZ2VyLnN3aWZ0IGluIFNvdXJjZXMgKi8sXG4iLCBjb250ZW50KQoKd2l0aCBvcGVuKHBieHByb2osICJ3IikgYXMgZjoKICAgIGYud3JpdGUoY29udGVudCkKCnByaW50KCJJQVBNYW5hZ2VyLnN3aWZ0IHp1bSBQcm9qZWt0IGhpbnp1Z2VmdWVndCIpCg==" | base64 --decode > /tmp/add_iap_to_xcode.py
+          python3 /tmp/add_iap_to_xcode.py
+
+      - name: Add StoreKit framework
+        run: |
+          echo "aW1wb3J0IHJlLCBzeXMKCnBieHByb2ogPSAiaW9zL0FwcC9BcHAueGNvZGVwcm9qL3Byb2plY3QucGJ4cHJvaiIKd2l0aCBvcGVuKHBieHByb2osICJyIikgYXMgZjoKICAgIGNvbnRlbnQgPSBmLnJlYWQoKQoKaWYgIlN0b3JlS2l0LmZyYW1ld29yayIgaW4gY29udGVudDoKICAgIHByaW50KCJTdG9yZUtpdCBiZXJlaXRzIHZvcmhhbmRlbiIpCiAgICBzeXMuZXhpdCgwKQoKcmVmX3V1aWQgICA9ICJBQTAwMDAwMTAwMDAwMDAwMDAwMDAwMkEiCmJ1aWxkX3V1aWQgPSAiQUEwMDAwMDEwMDAwMDAwMDAwMDAwMDJCIgoKYnVpbGRfZW50cnkgPSAiXHRcdCIgKyBidWlsZF91dWlkICsgIiAvKiBTdG9yZUtpdC5mcmFtZXdvcmsgaW4gRnJhbWV3b3JrcyAqLyA9IHtpc2EgPSBQQlhCdWlsZEZpbGU7IGZpbGVSZWYgPSAiICsgcmVmX3V1aWQgKyAiIC8qIFN0b3JlS2l0LmZyYW1ld29yayAqLzsgfTtcbiIKZmlsZV9lbnRyeSAgPSAiXHRcdCIgKyByZWZfdXVpZCArICIgLyogU3RvcmVLaXQuZnJhbWV3b3JrICovID0ge2lzYSA9IFBCWEZpbGVSZWZlcmVuY2U7IGxhc3RLbm93bkZpbGVUeXBlID0gd3JhcHBlci5mcmFtZXdvcms7IG5hbWUgPSBTdG9yZUtpdC5mcmFtZXdvcms7IHBhdGggPSBTeXN0ZW0vTGlicmFyeS9GcmFtZXdvcmtzL1N0b3JlS2l0LmZyYW1ld29yazsgc291cmNlVHJlZSA9IFNES1JPT1Q7IH07XG4iCgpjb250ZW50ID0gcmUuc3ViKHIiKC9cKiBCZWdpbiBQQlhCdWlsZEZpbGUgc2VjdGlvbiBcKi9cbikiLCByIlwxIiArIGJ1aWxkX2VudHJ5LCBjb250ZW50KQpjb250ZW50ID0gcmUuc3ViKHIiKC9cKiBCZWdpbiBQQlhGaWxlUmVmZXJlbmNlIHNlY3Rpb24gXCovXG4pIiwgciJcMSIgKyBmaWxlX2VudHJ5LCBjb250ZW50KQpjb250ZW50ID0gcmUuc3ViKAogICAgciIoL1wqIEJlZ2luIFBCWEZyYW1ld29ya3NCdWlsZFBoYXNlIHNlY3Rpb24gXCovLio/ZmlsZXMgPSBcKFxuKSIsCiAgICByIlwxXHRcdFx0XHQiICsgYnVpbGRfdXVpZCArICIgLyogU3RvcmVLaXQuZnJhbWV3b3JrIGluIEZyYW1ld29ya3MgKi8sXG4iLAogICAgY29udGVudCwgZmxhZ3M9cmUuRE9UQUxMCikKCndpdGggb3BlbihwYnhwcm9qLCAidyIpIGFzIGY6CiAgICBmLndyaXRlKGNvbnRlbnQpCgpwcmludCgiU3RvcmVLaXQuZnJhbWV3b3JrIGhpbnp1Z2VmdWVndCIpCg==" | base64 --decode > /tmp/add_storekit.py
+          python3 /tmp/add_storekit.py
+
       - name: Set Build Number
         run: |
-          BUILD_NUMBER=${{ github.run_number }}
-          echo "Setting build number to: $BUILD_NUMBER"
           cd ios/App
-          xcrun agvtool new-version -all $BUILD_NUMBER
+          xcrun agvtool new-version -all ${{ github.run_number }}
 
       - name: Set Version Number
         run: |
           cd ios/App
-          xcrun agvtool new-marketing-version 1.0
-          echo "Version set to 1.0"
+          xcrun agvtool new-marketing-version 1.1
 
       - name: Set App Icon
         run: |
@@ -92,7 +116,6 @@ jobs:
             "info": {"author":"xcode","version":1}
           }
           CONTENTS
-          echo "Icons gesetzt!"
 
       - name: Install CocoaPods
         run: |
@@ -106,7 +129,6 @@ jobs:
         run: |
           mkdir -p ~/private_keys
           echo -n "$API_KEY_BASE64" | base64 --decode > ~/private_keys/AuthKey_${API_KEY_ID}.p8
-          ls -la ~/private_keys/
 
       - name: Install signing certificate
         env:
@@ -132,9 +154,9 @@ jobs:
           echo "PP_UUID=$UUID" >> $GITHUB_ENV
           security find-identity -v -p codesigning
 
-      - name: Create Pods signing xcconfig
+      - name: Create Pods xcconfig to disable signing
         run: |
-          cat > /tmp/PodsSigning.xcconfig << EOF
+          cat > /tmp/PodsSigning.xcconfig << 'EOF'
           CODE_SIGNING_REQUIRED = NO
           CODE_SIGNING_ALLOWED = NO
           CODE_SIGN_IDENTITY =
@@ -142,13 +164,7 @@ jobs:
           PROVISIONING_PROFILE =
           EOF
 
-      - name: Disable Pods signing
-        run: |
-          cd ios/App
-          sed -i "" "/CODE_SIGNING_REQUIRED/d" Pods/Pods.xcodeproj/project.pbxproj || true
-          find Pods -name "*.xcconfig" -exec sed -i "" "/CODE_SIGN/d" {} \; || true
-
-      - name: Build archive (automatisches Signing)
+      - name: Build archive
         env:
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -170,8 +186,12 @@ jobs:
             CODE_SIGN_IDENTITY="Apple Distribution" \
             PROVISIONING_PROFILE="$PP_UUID" \
             OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
-            -xcconfig /tmp/PodsSigning.xcconfig \
-            2>&1 | grep -v "^note:" | grep -v "^warning:"
+            -xcconfig /tmp/PodsSigning.xcconfig 2>&1 | grep -v "^note:" | grep -v "^warning:"
+
+      - name: Verify archive
+        run: |
+          du -sh $RUNNER_TEMP/App.xcarchive
+          ls -la "$RUNNER_TEMP/App.xcarchive/Products/Applications/" || echo "No Applications folder!"
 
       - name: Create ExportOptions.plist
         run: |
@@ -212,7 +232,6 @@ jobs:
             -authenticationKeyPath ~/private_keys/AuthKey_${API_KEY_ID}.p8 \
             -authenticationKeyID "$API_KEY_ID" \
             -authenticationKeyIssuerID "$API_ISSUER_ID"
-          echo "=== Exported files ==="
           ls -lah $RUNNER_TEMP/export/
 
       - name: Upload to TestFlight
@@ -221,7 +240,6 @@ jobs:
           API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
           IPA_PATH=$(find $RUNNER_TEMP/export -name "*.ipa" | head -1)
-          echo "Uploading: $IPA_PATH ($(du -sh $IPA_PATH | cut -f1))"
           xcrun altool --upload-app \
             --type ios \
             --file "$IPA_PATH" \
