@@ -825,6 +825,97 @@
 </head>
 <body>
 
+<!-- ===== LOGIN SCREEN (Apple IAP) ===== -->
+<div id="license-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,#0a1a24 0%,#0f2d3d 60%,#123d4f 100%);flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity 0.4s;overflow-y:auto;">
+  <div style="width:100%;max-width:380px;">
+
+    <!-- Logo & Titel -->
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-family:'Exo 2',sans-serif;font-size:40px;font-weight:900;color:white;letter-spacing:-1px;">
+        <span style="color:#E82020;">Log</span><span style="color:white;">Ta</span>
+      </div>
+      <div style="font-family:'Exo 2',sans-serif;font-size:15px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:2px;margin-top:2px;">LOGISTIKER</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.35);font-weight:500;letter-spacing:1px;margin-top:6px;">Prüfungsvorbereitung IHK</div>
+    </div>
+
+    <!-- Was bekommst du -->
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px 20px;margin-bottom:20px;">
+      <div style="font-family:'Exo 2',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:1px;margin-bottom:12px;">VOLLVERSION ENTHÄLT</div>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.85);">
+          <span style="color:#22c55e;font-size:15px;">✓</span> Alle 12 Lernfelder &amp; Kapitel
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.85);">
+          <span style="color:#22c55e;font-size:15px;">✓</span> Lernkarten mit Erklärungen
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.85);">
+          <span style="color:#22c55e;font-size:15px;">✓</span> Prüfungsfragen mit Quiz
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.85);">
+          <span style="color:#22c55e;font-size:15px;">✓</span> Fortschrittsverfolgung &amp; Statistiken
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.85);">
+          <span style="color:#22c55e;font-size:15px;">✓</span> Einmaliger Kauf · Kein Abo · Für immer
+        </div>
+      </div>
+    </div>
+
+    <!-- Kauf-Karte -->
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:24px;">
+
+      <!-- Fehleranzeige IAP -->
+      <div id="iap-error" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px;margin-bottom:14px;font-size:12px;color:#ef4444;text-align:center;"></div>
+
+      <!-- Kaufen Button -->
+      <button id="iap-buy-btn" onclick="iapPurchase()"
+        style="width:100%;background:linear-gradient(135deg,#E82020,#b51818);border:none;border-radius:14px;padding:17px;font-family:'Exo 2',sans-serif;font-size:17px;font-weight:900;color:white;cursor:pointer;letter-spacing:0.3px;transition:opacity 0.2s;margin-bottom:10px;box-shadow:0 4px 24px rgba(232,32,32,0.4);"
+        onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
+        🎓 Jetzt kaufen – 59,99 €
+      </button>
+
+      <!-- Lade-Indikator -->
+      <div id="iap-loading" style="display:none;text-align:center;padding:12px;font-size:13px;color:rgba(255,255,255,0.5);">⏳ Verbinde mit App Store…</div>
+
+      <!-- Trennlinie -->
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;">
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);font-weight:600;">ODER</div>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div>
+      </div>
+
+      <!-- Kostenlos reinschauen -->
+      <button onclick="openFreeContent()"
+        style="width:100%;background:transparent;border:1.5px solid rgba(255,255,255,0.2);border-radius:14px;padding:14px;font-family:'Exo 2',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);cursor:pointer;letter-spacing:0.3px;transition:all 0.2s;margin-bottom:14px;"
+        onmouseover="this.style.borderColor='rgba(255,255,255,0.5)';this.style.color='white'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.75)'">
+        👀 Kostenlos reinschauen
+      </button>
+
+      <!-- Kauf wiederherstellen (Apple Pflicht) -->
+      <button onclick="iapRestore()"
+        style="width:100%;background:transparent;border:none;padding:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.35);cursor:pointer;transition:color 0.2s;"
+        onmouseover="this.style.color='rgba(255,255,255,0.65)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
+        Kauf wiederherstellen
+      </button>
+
+      <!-- Zurück zur App (nur wenn bereits gekauft/Gratis-Bereich) -->
+      <button id="license-back-btn" onclick="closeLicenseScreen()" style="display:none;width:100%;background:transparent;border:1.5px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px;font-family:'Exo 2',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,0.45);cursor:pointer;margin-top:8px;">
+        ← Zurück zur App
+      </button>
+
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align:center;margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);line-height:1.9;">
+      IHK Logistiker · Prüfungsvorbereitung<br>
+      <span onclick="showPrivacyInfo()" style="cursor:pointer;text-decoration:underline;">Datenschutz</span> &nbsp;·&nbsp;
+      <span onclick="showTermsInfo()" style="cursor:pointer;text-decoration:underline;">Nutzungsbedingungen</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== APP CONTENT (von License-Screen überdeckt wenn nicht gekauft) ===== -->
+
 <!-- Mobile Topbar -->
 <div class="mobile-topbar">
   <button class="hamburger-btn" id="hamburger" onclick="toggleSidebar()">
@@ -8896,6 +8987,14 @@
   }
 
   function navigate(el, id, title, sub) {
+    // Paywall-Check: Im Demo-Modus nur Startseite + LF1 frei.
+    // Freigeschaltet ohne Kauf: startseite, alle Statistiken, backup.
+    // Gesperrt: alle Fachbereiche, Prüfung, Quiz, Fachrechnen, Lernkarten.
+    var PAYWALLED = ['log','rgu','wiso','pruefung','quiz','fachrechnen','lernkarten','lernkarten-player'];
+    if (!isFullLicense() && PAYWALLED.indexOf(id) !== -1) {
+      showPaywallOverlay();
+      return;
+    }
     document.querySelectorAll('.nav-item, .fach-item').forEach(e => e.classList.remove('active'));
     el.classList.add('active');
     document.getElementById('sidebar').classList.remove('open');
@@ -10277,6 +10376,11 @@
   }
 
   function showLF(id) {
+    // Paywall-Check: Im Demo-Modus nur lf1 frei
+    if (!isFullLicense() && id !== 'lf1') {
+      showPaywallOverlay();
+      return;
+    }
     hideAllPages();
     var page = document.getElementById('page-' + id);
     if (page) { page.style.display = 'flex'; window.scrollTo(0, 0); }
@@ -20122,11 +20226,167 @@ function showOnboarding(step, trialExpired, fromSidebar) {
   document.body.appendChild(overlay);
 }
 
-function updateFreischaltenBtn() {
-  const btn = document.getElementById('nav-freischalten');
-  if (btn) btn.style.display = 'none';
+// ===== LIZENZ & IAP SYSTEM =====
+const DEV_MODE = false; // auf true für Tests, auf false vor Release!
+
+const LICENSE_KEY = 'logta-license';
+const IAP_PRODUCT_ID = 'com.logta.logistiker.fullversion';
+const IAP_LICENSE_VALUE = 'APPLE_IAP_PURCHASED';
+
+// Datenschutz & Nutzungsbedingungen
+function showPrivacyInfo() {
+  alert('Datenschutz\n\nDiese App speichert ausschließlich lokale Lernfortschrittsdaten auf deinem Gerät (localStorage). Es werden keine personenbezogenen Daten an Server übertragen.\n\nIn-App-Käufe werden über Apple verarbeitet. Es gelten die Datenschutzrichtlinien von Apple.');
+}
+function showTermsInfo() {
+  alert('Nutzungsbedingungen\n\nDiese App ist für den persönlichen Gebrauch zur IHK-Prüfungsvorbereitung (Fachkraft für Lagerlogistik / Fachlagerist) bestimmt. Eine Weitergabe, Vervielfältigung oder kommerzielle Nutzung ist nicht gestattet.\n\nDer Kauf ist einmalig und gilt dauerhaft für den Apple-Account, mit dem der Kauf getätigt wurde.');
 }
 
+// Prüft ob Vollversion freigeschaltet ist
+function isFullLicense() {
+  if (window.DEV_MODE) return true;
+  const saved = localStorage.getItem(LICENSE_KEY);
+  if (!saved) return false;
+  if (saved === IAP_LICENSE_VALUE) return true;
+  return false;
+}
+
+// ===== APPLE IAP FUNKTIONEN =====
+function iapSetLoading(show) {
+  const btn = document.getElementById('iap-buy-btn');
+  const loading = document.getElementById('iap-loading');
+  if (btn) btn.style.display = show ? 'none' : 'block';
+  if (loading) loading.style.display = show ? 'block' : 'none';
+}
+
+function iapShowError(msg) {
+  const el = document.getElementById('iap-error');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+  iapSetLoading(false);
+}
+
+// Wird vom nativen iOS-Layer aufgerufen nach erfolgreichem Kauf
+function iapSuccess() {
+  try { localStorage.setItem(LICENSE_KEY, IAP_LICENSE_VALUE); } catch(e) {}
+  iapSetLoading(false);
+  openApp();
+}
+
+function iapPurchase() {
+  if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.iapPurchase) {
+    iapSetLoading(true);
+    window.webkit.messageHandlers.iapPurchase.postMessage({ productId: IAP_PRODUCT_ID });
+  } else {
+    iapShowError('In-App-Kauf ist nur in der iOS App verfügbar.');
+  }
+}
+
+function iapRestore() {
+  if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.iapRestore) {
+    iapSetLoading(true);
+    window.webkit.messageHandlers.iapRestore.postMessage({});
+  } else {
+    iapShowError('Kauf wiederherstellen ist nur in der iOS App möglich.');
+  }
+}
+
+// Kostenlos reinschauen (Demo-Modus): direkt nach LF1 navigieren
+function openFreeContent() {
+  const ls = document.getElementById('license-screen');
+  if (ls) { ls.style.opacity = '0'; setTimeout(() => { ls.style.display = 'none'; }, 400); }
+  const backBtn = document.getElementById('license-back-btn');
+  if (backBtn) backBtn.style.display = 'none';
+  window.FREE_MODE = true;
+  if (typeof updateBanner === 'function') updateBanner();
+  // Nach Fade-Animation direkt zu LF1 navigieren (einziges freies Lernfeld)
+  setTimeout(() => {
+    if (typeof showLF === 'function') showLF('lf1');
+  }, 500);
+}
+
+// App öffnen nach Kauf/Wiederherstellung
+function openApp() {
+  const ls = document.getElementById('license-screen');
+  if (ls) { ls.style.opacity = '0'; setTimeout(() => { ls.style.display = 'none'; }, 400); }
+  const backBtn = document.getElementById('license-back-btn');
+  if (backBtn) backBtn.style.display = 'none';
+  window.FREE_MODE = false;
+  updateFreischaltenBtn();
+  if (typeof updateBanner === 'function') updateBanner();
+}
+
+// License-Screen öffnen (z.B. via Sidebar-Button "Lernapp freischalten")
+function openLicenseScreen() {
+  const ls = document.getElementById('license-screen');
+  if (!ls) return;
+  const errEl = document.getElementById('iap-error');
+  if (errEl) errEl.style.display = 'none';
+  iapSetLoading(false);
+  ls.style.display = 'flex';
+  ls.style.opacity = '1';
+  // Zurück-Button anzeigen, damit User aus License-Screen raus kann
+  const backBtn = document.getElementById('license-back-btn');
+  if (backBtn) backBtn.style.display = 'block';
+}
+
+function closeLicenseScreen() {
+  const ls = document.getElementById('license-screen');
+  if (!ls) return;
+  ls.style.opacity = '0';
+  setTimeout(() => { ls.style.display = 'none'; }, 400);
+}
+
+// Zeigt/versteckt Sidebar-Button "Lernapp freischalten"
+function updateFreischaltenBtn() {
+  const btn = document.getElementById('nav-freischalten');
+  if (!btn) return;
+  if (isFullLicense()) {
+    btn.style.display = 'none';
+  } else {
+    btn.style.display = '';
+    btn.onclick = function() { openLicenseScreen(); };
+  }
+}
+
+// ===== PAYWALL OVERLAY (für gesperrte Funktionen im Demo-Modus) =====
+function showPaywallOverlay() {
+  if (isFullLicense()) return;
+  const existing = document.getElementById('paywall-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'paywall-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:8888;background:rgba(10,26,36,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;backdrop-filter:blur(6px);';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:360px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+      <div style="font-family:'Exo 2',sans-serif;font-size:22px;font-weight:900;color:white;margin-bottom:8px;">Vollversion erforderlich</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.55);margin-bottom:28px;line-height:1.6;">
+        Diese Funktion ist Teil der Vollversion.<br>
+        Einmaliger Kauf · Alle Inhalte · Für immer.
+      </div>
+      <button onclick="document.getElementById('paywall-overlay').remove();openLicenseScreen();"
+        style="width:100%;background:linear-gradient(135deg,#E82020,#b51818);border:none;border-radius:14px;padding:16px;font-family:'Exo 2',sans-serif;font-size:16px;font-weight:900;color:white;cursor:pointer;margin-bottom:12px;box-shadow:0 4px 20px rgba(232,32,32,0.4);">
+        🎓 Jetzt kaufen – 59,99 €
+      </button>
+      <button onclick="document.getElementById('paywall-overlay').remove();"
+        style="width:100%;background:transparent;border:1.5px solid rgba(255,255,255,0.18);border-radius:14px;padding:13px;font-family:'Exo 2',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.6);cursor:pointer;">
+        ← Zurück
+      </button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+// ===== NATIVE iOS BRIDGE CALLBACKS =====
+// Werden vom Swift-WKScriptMessageHandler aufgerufen
+window.onIAPSuccess = function() { iapSuccess(); };
+window.onIAPError = function(msg) { iapShowError(msg || 'Kauf fehlgeschlagen. Bitte versuche es erneut.'); };
+window.onIAPRestoreSuccess = function() { iapSuccess(); };
+window.onIAPRestoreEmpty = function() {
+  iapSetLoading(false);
+  iapShowError('Kein vorheriger Kauf gefunden.');
+};
+
+// ===== LEGACY STUBS (für Kompatibilität mit altem Code) =====
 function submitCode(fromSidebar) {}
 function startTrial() {}
 function getTrialDaysLeft() { return null; }
@@ -20762,12 +21022,20 @@ function lkStatReset() {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
-  updateBanner();
-  updateFreischaltenBtn();
-  // App ist direkt freigeschaltet (Einmalkauf über App Store)
-  // Nur Name/Datum abfragen wenn noch nicht gesetzt
-  if (!localStorage.getItem('logta-username')) {
-    setTimeout(()=>showOnboarding(1), 600);
+  const licScreen = document.getElementById('license-screen');
+
+  if (isFullLicense()) {
+    // Vollversion freigeschaltet → License-Screen bleibt versteckt
+    if (licScreen) licScreen.style.display = 'none';
+    window.FREE_MODE = false;
+    updateBanner();
+    updateFreischaltenBtn();
+    if (!localStorage.getItem('logta-username')) {
+      setTimeout(()=>showOnboarding(1), 600);
+    }
+  } else {
+    // Nicht freigeschaltet → License-Screen zeigen (überdeckt die App per position:fixed)
+    if (licScreen) licScreen.style.display = 'flex';
   }
 });
 </script>
