@@ -17,6 +17,19 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Select Xcode 26
+        run: |
+          echo "=== Verfuegbare Xcode-Versionen ==="
+          ls /Applications | grep Xcode
+          XCODE_PATH=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -z "$XCODE_PATH" ]; then
+            echo "WARNUNG: Kein Xcode 26 gefunden, nehme neueste verfuegbare Version"
+            XCODE_PATH=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          fi
+          echo "Verwende: $XCODE_PATH"
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          xcodebuild -version
+
       - name: Install dependencies
         run: npm install
 
