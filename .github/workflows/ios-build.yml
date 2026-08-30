@@ -36,7 +36,7 @@ jobs:
 
       - name: In eigenen IAP-Code einbauen
         run: |
-          cp native-ios/MainViewController.swift ios/App/App/MainViewController.swift
+          cp MainViewController.swift ios/App/App/MainViewController.swift
           sed -i '' 's/customClass="CAPBridgeViewController"/customClass="MainViewController" customModule="App" customModuleProvider="target"/' ios/App/App/Base.lproj/Main.storyboard
           echo "=== Pruefung: Custom Class im Storyboard ==="
           grep -o 'customClass="[^"]*"' ios/App/App/Base.lproj/Main.storyboard
