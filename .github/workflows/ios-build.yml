@@ -37,9 +37,36 @@ jobs:
       - name: In eigenen IAP-Code einbauen
         run: |
           cp MainViewController.swift ios/App/App/MainViewController.swift
-          sed -i '' 's/customClass="CAPBridgeViewController"/customClass="MainViewController" customModule="App" customModuleProvider="target"/' ios/App/App/Base.lproj/Main.storyboard
-          echo "=== Pruefung: Custom Class im Storyboard ==="
-          grep -o 'customClass="[^"]*"' ios/App/App/Base.lproj/Main.storyboard
+          python3 << 'PYSCRIPT'
+import re
+
+path = "ios/App/App/Base.lproj/Main.storyboard"
+with open(path, "r") as f:
+    content = f.read()
+
+def fix_line(match):
+    line = match.group(0)
+    line = line.replace('customClass="CAPBridgeViewController"', 'customClass="MainViewController"')
+    if 'customModule=' in line:
+        line = re.sub(r'customModule="[^"]*"', 'customModule="App"', line)
+    else:
+        line = line.replace('customClass="MainViewController"', 'customClass="MainViewController" customModule="App"')
+    if 'customModuleProvider=' in line:
+        line = re.sub(r'customModuleProvider="[^"]*"', 'customModuleProvider="target"', line)
+    else:
+        line = line.replace('customModule="App"', 'customModule="App" customModuleProvider="target"')
+    return line
+
+content = re.sub(r'.*customClass="CAPBridgeViewController".*', fix_line, content)
+
+with open(path, "w") as f:
+    f.write(content)
+
+print("=== Pruefung: Custom Class im Storyboard ===")
+for line in content.split("\n"):
+    if "customClass=" in line:
+        print(line.strip())
+PYSCRIPT
 
       - name: Set Build Number
         run: |
