@@ -18,6 +18,7 @@ import WebKit
 import StoreKit
 import Capacitor
 
+@available(iOS 15.0, *)
 final class IAPBridge: NSObject, WKScriptMessageHandler {
 
     static let shared = IAPBridge()
