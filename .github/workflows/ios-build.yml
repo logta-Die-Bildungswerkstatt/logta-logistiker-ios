@@ -34,23 +34,25 @@ jobs:
           npx cap add ios || true
           npx cap sync ios
 
-      - name: In eigenen IAP-Code einbauen (sicher, ohne Storyboard-Aenderung)
+      - name: In eigenen IAP-Code einbauen (alles in AppDelegate.swift, kein Cross-File-Problem)
         run: |
-          cp IAPBridge.swift ios/App/App/IAPBridge.swift
           python3 << 'PYSCRIPT'
           import re
           import sys
 
-          path = "ios/App/App/AppDelegate.swift"
-          with open(path, "r") as f:
-              content = f.read()
+          app_delegate_path = "ios/App/App/AppDelegate.swift"
+          iap_bridge_path = "IAPBridge.swift"
+
+          with open(app_delegate_path, "r") as f:
+              app_content = f.read()
+
+          with open(iap_bridge_path, "r") as f:
+              iap_content = f.read()
 
           marker = "func applicationDidBecomeActive(_ application: UIApplication) {"
 
-          if marker not in content:
+          if marker not in app_content:
               print("FEHLER: Erwartete Zeile in AppDelegate.swift nicht gefunden!")
-              print("Das Capacitor-Template hat sich vermutlich geaendert.")
-              print("Build wird gestoppt, um keine kaputte App zu bauen.")
               sys.exit(1)
 
           hook_code = """        if let rootVC = self.window?.rootViewController as? CAPBridgeViewController,
@@ -59,18 +61,41 @@ jobs:
                   }
           """
 
-          content = content.replace(marker, marker + "\n" + hook_code, 1)
+          app_content = app_content.replace(marker, marker + "\n" + hook_code, 1)
 
-          if "import Capacitor" not in content:
-              content = content.replace("import UIKit", "import UIKit\nimport Capacitor", 1)
+          if "import Capacitor" not in app_content:
+              app_content = app_content.replace("import UIKit", "import UIKit\nimport Capacitor", 1)
 
-          with open(path, "w") as f:
-              f.write(content)
+          # WICHTIG: IAPBridge-Klasse wird an dieselbe Datei angehaengt, damit sie
+          # garantiert im selben Compile-Vorgang sichtbar ist (kein Cross-File-Problem).
+          import_lines = []
+          class_lines = []
+          in_imports = True
+          for line in iap_content.split("\n"):
+              stripped = line.strip()
+              if in_imports and (stripped.startswith("import ") or stripped == "" or stripped.startswith("//")):
+                  if stripped.startswith("import "):
+                      import_lines.append(stripped)
+                  continue
+              in_imports = False
+              class_lines.append(line)
 
-          print("AppDelegate.swift erfolgreich ergaenzt.")
-          print("=== Kontrolle ===")
-          for line in content.split("\n"):
-              if "IAPBridge" in line or "func applicationDidBecomeActive" in line:
+          for imp in import_lines:
+              if imp not in app_content:
+                  app_content = app_content.replace("import Capacitor", "import Capacitor\n" + imp, 1)
+
+          app_content = app_content.rstrip() + "\n\n// === Angehaengt: IAPBridge (siehe IAPBridge.swift im Repo-Root) ===\n" + "\n".join(class_lines) + "\n"
+
+          with open(app_delegate_path, "w") as f:
+              f.write(app_content)
+
+          print("AppDelegate.swift erfolgreich ergaenzt (IAPBridge im selben File).")
+          print("=== Kontrolle: IAPBridge-Vorkommen ===")
+          count = app_content.count("class IAPBridge")
+          print(f"class IAPBridge gefunden: {count}x")
+          print("=== Kontrolle: Hook ===")
+          for line in app_content.split("\n"):
+              if "IAPBridge.shared.attach" in line:
                   print(line)
           PYSCRIPT
 
