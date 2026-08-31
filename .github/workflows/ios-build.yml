@@ -190,7 +190,6 @@ jobs:
           API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
-          set -o pipefail
           cd ios/App
           xcodebuild \
             -workspace App.xcworkspace \
@@ -209,12 +208,17 @@ jobs:
             PROVISIONING_PROFILE="$PP_UUID" \
             OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/app-signing.keychain-db" \
             -xcconfig /tmp/PodsSigning.xcconfig 2>&1 | tee /tmp/xcodebuild.log | grep -v "^note:" | grep -v "^warning:"
-          BUILD_STATUS=${PIPESTATUS[0]}
-          if [ "$BUILD_STATUS" -ne 0 ]; then
-            echo "=== ECHTER FEHLER GEFUNDEN (Build ist wirklich fehlgeschlagen) ==="
-            grep -A 5 "error:" /tmp/xcodebuild.log || tail -100 /tmp/xcodebuild.log
+          BUILD_STATUS="${PIPESTATUS[0]}"
+          echo "xcodebuild exit code: $BUILD_STATUS"
+          if [ "$BUILD_STATUS" != "0" ]; then
+            echo ""
+            echo "############################################"
+            echo "### ECHTER COMPILER-FEHLER (nicht versteckt) ###"
+            echo "############################################"
+            grep -B 2 -A 8 "error:" /tmp/xcodebuild.log || tail -150 /tmp/xcodebuild.log
             exit 1
           fi
+        shell: bash --noprofile --norc -o pipefail {0}
 
       - name: Verify archive
         run: |
