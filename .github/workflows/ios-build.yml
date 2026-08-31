@@ -55,9 +55,11 @@ jobs:
               print("FEHLER: Erwartete Zeile in AppDelegate.swift nicht gefunden!")
               sys.exit(1)
 
-          hook_code = """        if let rootVC = self.window?.rootViewController as? CAPBridgeViewController,
-                     let webView = rootVC.bridge?.webView {
-                      IAPBridge.shared.attach(to: webView)
+          hook_code = """        if #available(iOS 15.0, *) {
+                      if let rootVC = self.window?.rootViewController as? CAPBridgeViewController,
+                         let webView = rootVC.bridge?.webView {
+                          IAPBridge.shared.attach(to: webView)
+                      }
                   }
           """
 
