@@ -413,6 +413,9 @@
   .tabelle td { padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #374151; line-height: 1.5; }
   .tabelle tr:nth-child(even) td { background: #f8fafc; }
   .tabelle tr:hover td { background: #eff6ff; }
+  /* Dezente Farbakzente: die beiden letzten Spalten (meist "Bedeutung"/Erklärung) leicht einfärben – gilt für alle Tabellen/Fächer */
+  .tabelle td:nth-last-child(2):not(:first-child) { background: #eef4fb; }
+  .tabelle td:last-child:not(:first-child) { background: #fdf1e7; }
   @media(max-width:768px){
     /* Tabelle auf Mobile: jede Zeile wird zur Karte */
     table.tabelle { display:block; width:100%; }
@@ -437,6 +440,8 @@
       word-break: break-word;
     }
     table.tabelle td:last-child { border-bottom: none; }
+    table.tabelle td:nth-last-of-type(2):not(:first-child) { background: #eef4fb; }
+    table.tabelle td:last-child:not(:first-child) { background: #fdf1e7; }
     table.tabelle td::before {
       content: attr(data-label);
       font-weight: 700;
@@ -870,7 +875,7 @@
       <button id="iap-buy-btn" onclick="iapPurchase()"
         style="width:100%;background:linear-gradient(135deg,#E82020,#b51818);border:none;border-radius:14px;padding:17px;font-family:'Exo 2',sans-serif;font-size:17px;font-weight:900;color:white;cursor:pointer;letter-spacing:0.3px;transition:opacity 0.2s;margin-bottom:10px;box-shadow:0 4px 24px rgba(232,32,32,0.4);"
         onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
-        🎓 Jetzt kaufen – 59,99 €
+        🎓 Jetzt kaufen – <span class="iap-price-label" data-fallback-price="59,99 €">59,99 €</span>
       </button>
 
       <!-- Lade-Indikator -->
@@ -20292,62 +20297,155 @@ function showOnboarding(step, trialExpired, fromSidebar) {
 const DEV_MODE = false; // auf true für Tests, auf false vor Release!
 
 const LICENSE_KEY = 'logta-license';
+// WICHTIG: Diese Produkt-ID muss 1:1 sowohl in App Store Connect (Apple)
+// als auch in der Google Play Console (In-App-Produkt) angelegt werden,
+// jeweils mit Preis 59,99 € (bzw. dem lokalisierten Gegenwert).
 const IAP_PRODUCT_ID = 'com.logta.logistiker.fullversion';
-const IAP_LICENSE_VALUE = 'APPLE_IAP_PURCHASED';
+const IAP_LICENSE_VALUE = 'IAP_PURCHASED';           // aktueller, plattformneutraler Wert
+const IAP_LICENSE_VALUE_LEGACY = 'APPLE_IAP_PURCHASED'; // alter Wert – bleibt gültig für bereits gekaufte iOS-Installationen
 
 // Datenschutz & Nutzungsbedingungen
 function showPrivacyInfo() {
-  alert('Datenschutz\n\nDiese App speichert ausschließlich lokale Lernfortschrittsdaten auf deinem Gerät (localStorage). Es werden keine personenbezogenen Daten an Server übertragen.\n\nIn-App-Käufe werden über Apple verarbeitet. Es gelten die Datenschutzrichtlinien von Apple.');
+  alert('Datenschutz\n\nDiese App speichert ausschließlich lokale Lernfortschrittsdaten auf deinem Gerät (localStorage). Es werden keine personenbezogenen Daten an Server übertragen.\n\nIn-App-Käufe werden je nach Plattform über Apple (App Store) oder Google (Google Play Billing) verarbeitet. Es gelten die jeweiligen Datenschutzrichtlinien von Apple bzw. Google.');
 }
 function showTermsInfo() {
-  alert('Nutzungsbedingungen\n\nDiese App ist für den persönlichen Gebrauch zur Prüfungsvorbereitung (Fachkraft für Lagerlogistik / Fachlagerist) bestimmt. Eine Weitergabe, Vervielfältigung oder kommerzielle Nutzung ist nicht gestattet.\n\nDer Kauf ist einmalig und gilt dauerhaft für den Apple-Account, mit dem der Kauf getätigt wurde.');
+  alert('Nutzungsbedingungen\n\nDiese App ist für den persönlichen Gebrauch zur Prüfungsvorbereitung (Fachkraft für Lagerlogistik / Fachlagerist) bestimmt. Eine Weitergabe, Vervielfältigung oder kommerzielle Nutzung ist nicht gestattet.\n\nDer Kauf ist einmalig und gilt dauerhaft für den Apple- bzw. Google-Account, mit dem der Kauf getätigt wurde.');
 }
+
+// ===== PREIS-ANZEIGE (zentral, damit nie eine Stelle vergessen wird) =====
+// Apple/Google verlangen, dass der angezeigte Preis exakt dem im Store hinterlegten
+// Preis entspricht (inkl. korrekter Währung je Storefront). Der Text unten ist nur
+// ein Fallback für den Fall, dass die native Bridge (noch) keinen Preis geliefert hat.
+// Sobald die native Seite den echten, lokalisierten Preis kennt (z.B. aus
+// SKProduct.priceLocale bzw. StoreKit 2 product.displayPrice), MUSS sie
+// window.setIAPDisplayPrice('<lokalisierter Preis>') aufrufen, damit hier nie ein
+// falscher/veralteter Preis stehen bleibt.
+function setIAPDisplayPrice(localizedPrice) {
+  if (!localizedPrice) return;
+  document.querySelectorAll('.iap-price-label').forEach(function(el) {
+    el.textContent = localizedPrice;
+  });
+}
+window.setIAPDisplayPrice = setIAPDisplayPrice;
 
 // Prüft ob Vollversion freigeschaltet ist
 function isFullLicense() {
-  if (window.DEV_MODE) return true;
-  const saved = localStorage.getItem(LICENSE_KEY);
-  if (!saved) return false;
-  if (saved === IAP_LICENSE_VALUE) return true;
-  return false;
+  // Echte Lizenzprüfung (Kaufscreen ist aktiv).
+  // try/catch: manche WebViews (v.a. bei erstem App-Start ohne Netz-/Storage-Zugriff)
+  // werfen bei localStorage-Zugriff einen Fehler -> ohne Abfangen bliebe die App
+  // an dieser Stelle hängen ("schwarzer Bildschirm" nach dem Download).
+  try {
+    const saved = localStorage.getItem(LICENSE_KEY);
+    return saved === IAP_LICENSE_VALUE || saved === IAP_LICENSE_VALUE_LEGACY;
+  } catch (e) {
+    return false;
+  }
 }
 
-// ===== APPLE IAP FUNKTIONEN =====
+// Erkennt, welche native Kauf-Bridge verfügbar ist (iOS-WebView, Android-WebView, oder keine/Browser)
+function iapPlatform() {
+  if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.iapPurchase) return 'ios';
+  if (window.Android && typeof window.Android.iapPurchase === 'function') return 'android';
+  return null;
+}
+
+// ===== iOS & ANDROID IAP FUNKTIONEN =====
+// Sicherheits-Timeout für den Ladezustand: Verhindert, dass der Kauf-Button
+// nach einem Download für immer im "Verbinde..."-Zustand hängen bleibt, falls die
+// native Bridge aus irgendeinem Grund nie zurückruft (Netzwerkfehler, App-Store-
+// Ausfall, o.ä.). Das war die Ursache eines früheren "Zeitproblems".
+let iapWatchdogTimer = null;
+
 function iapSetLoading(show) {
   const btn = document.getElementById('iap-buy-btn');
   const loading = document.getElementById('iap-loading');
   if (btn) btn.style.display = show ? 'none' : 'block';
   if (loading) loading.style.display = show ? 'block' : 'none';
+
+  if (iapWatchdogTimer) { clearTimeout(iapWatchdogTimer); iapWatchdogTimer = null; }
+  if (show) {
+    iapWatchdogTimer = setTimeout(function() {
+      // Nach 20s ohne Rückmeldung: Ladezustand beenden und dem Nutzer erklären,
+      // dass es evtl. eine Freigabe braucht (Ask to Buy) oder er es erneut
+      // versuchen soll. WICHTIG: Kein "Fehler"-Ton, da die native Seite die
+      // Transaktion evtl. noch später (im Hintergrund) erfolgreich abschließt -
+      // Apple verlangt ausdrücklich, dass die App währenddessen nutzbar bleibt.
+      iapSetLoading(false);
+      iapShowError('Der Kauf dauert länger als erwartet. Falls eine Kaufgenehmigung nötig ist (z.B. "Ask to Buy" bei Familienfreigabe), wird die Freischaltung automatisch erfolgen, sobald sie bestätigt wurde. Du kannst die App bis dahin normal weiter nutzen.');
+    }, 20000);
+  }
 }
 
 function iapShowError(msg) {
   const el = document.getElementById('iap-error');
-  if (el) { el.textContent = msg; el.style.display = 'block'; }
+  if (el) { el.style.color = '#ef4444'; el.textContent = msg; el.style.display = 'block'; }
   iapSetLoading(false);
 }
 
 // Wird vom nativen iOS-Layer aufgerufen nach erfolgreichem Kauf
 function iapSuccess() {
   try { localStorage.setItem(LICENSE_KEY, IAP_LICENSE_VALUE); } catch(e) {}
+  const errEl = document.getElementById('iap-error');
+  if (errEl) errEl.style.display = 'none';
   iapSetLoading(false);
   openApp();
 }
 
+// Wird vom nativen Layer aufgerufen, wenn eine Transaktion in den Zustand
+// "deferred"/"pending" wechselt (z.B. Ask to Buy bei Family Sharing, oder
+// eine ausstehende Zahlungsgenehmigung). Apple verlangt hier ausdrücklich,
+// dass die UI NICHT blockiert wird und der Nutzer die App normal weiter
+// verwenden kann, während die Freigabe/Bestätigung im Hintergrund aussteht.
+function iapDeferred() {
+  iapSetLoading(false);
+  const el = document.getElementById('iap-error');
+  if (el) {
+    el.style.color = '#f59e0b';
+    el.textContent = 'Dein Kauf wartet auf eine Genehmigung (z.B. durch ein Familienmitglied bei "Ask to Buy"). Die Vollversion wird automatisch freigeschaltet, sobald die Genehmigung erfolgt ist – du musst nichts weiter tun.';
+    el.style.display = 'block';
+  }
+  const backBtn = document.getElementById('license-back-btn');
+  if (backBtn) backBtn.style.display = 'block';
+}
+window.onIAPDeferred = iapDeferred;
+
 function iapPurchase() {
-  if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.iapPurchase) {
+  const platform = iapPlatform();
+  const errEl = document.getElementById('iap-error');
+  if (errEl) errEl.style.display = 'none';
+  if (platform === 'ios') {
     iapSetLoading(true);
     window.webkit.messageHandlers.iapPurchase.postMessage({ productId: IAP_PRODUCT_ID });
+  } else if (platform === 'android') {
+    iapSetLoading(true);
+    // Native Android-Layer startet hier den Google Play Billing-Kaufvorgang (BillingClient.launchBillingFlow)
+    // und ruft nach Abschluss window.onIAPSuccess() bzw. window.onIAPError(msg) auf.
+    try {
+      window.Android.iapPurchase(IAP_PRODUCT_ID);
+    } catch (e) {
+      iapShowError('Kauf konnte nicht gestartet werden. Bitte versuche es erneut.');
+    }
   } else {
-    iapShowError('In-App-Kauf ist nur in der iOS App verfügbar.');
+    iapShowError('In-App-Kauf ist nur in der iOS- oder Android-App verfügbar.');
   }
 }
 
 function iapRestore() {
-  if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.iapRestore) {
+  const platform = iapPlatform();
+  if (platform === 'ios') {
     iapSetLoading(true);
     window.webkit.messageHandlers.iapRestore.postMessage({});
+  } else if (platform === 'android') {
+    iapSetLoading(true);
+    // Native Android-Layer fragt hier über BillingClient.queryPurchasesAsync() vorhandene Käufe ab
+    // und ruft anschließend window.onIAPRestoreSuccess() bzw. window.onIAPRestoreEmpty() auf.
+    try {
+      window.Android.iapRestore();
+    } catch (e) {
+      iapShowError('Kauf wiederherstellen fehlgeschlagen. Bitte versuche es erneut.');
+    }
   } else {
-    iapShowError('Kauf wiederherstellen ist nur in der iOS App möglich.');
+    iapShowError('Kauf wiederherstellen ist nur in der iOS- oder Android-App möglich.');
   }
 }
 
@@ -20425,9 +20523,9 @@ function showPaywallOverlay() {
         Diese Funktion ist Teil der Vollversion.<br>
         Einmaliger Kauf · Alle Inhalte · Für immer.
       </div>
-      <button onclick="document.getElementById('paywall-overlay').remove();openLicenseScreen();"
+      <button id="paywall-buy-btn" onclick="document.getElementById('paywall-overlay').remove();openLicenseScreen();"
         style="width:100%;background:linear-gradient(135deg,#E82020,#b51818);border:none;border-radius:14px;padding:16px;font-family:'Exo 2',sans-serif;font-size:16px;font-weight:900;color:white;cursor:pointer;margin-bottom:12px;box-shadow:0 4px 20px rgba(232,32,32,0.4);">
-        🎓 Jetzt kaufen – 59,99 €
+        🎓 Jetzt kaufen – <span class="iap-price-label" data-fallback-price="59,99 €">59,99 €</span>
       </button>
       <button onclick="document.getElementById('paywall-overlay').remove();"
         style="width:100%;background:transparent;border:1.5px solid rgba(255,255,255,0.18);border-radius:14px;padding:13px;font-family:'Exo 2',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.6);cursor:pointer;">
@@ -20438,8 +20536,9 @@ function showPaywallOverlay() {
   document.body.appendChild(overlay);
 }
 
-// ===== NATIVE iOS BRIDGE CALLBACKS =====
-// Werden vom Swift-WKScriptMessageHandler aufgerufen
+// ===== NATIVE BRIDGE CALLBACKS (iOS & Android) =====
+// iOS: werden vom Swift-WKScriptMessageHandler aufgerufen
+// Android: werden vom nativen Kotlin/Java-Layer per webView.evaluateJavascript(...) aufgerufen
 window.onIAPSuccess = function() { iapSuccess(); };
 window.onIAPError = function(msg) { iapShowError(msg || 'Kauf fehlgeschlagen. Bitte versuche es erneut.'); };
 window.onIAPRestoreSuccess = function() { iapSuccess(); };
@@ -21099,18 +21198,28 @@ function lkStatReset() {
 window.addEventListener('DOMContentLoaded', function() {
   const licScreen = document.getElementById('license-screen');
 
-  if (isFullLicense()) {
-    // Vollversion freigeschaltet → License-Screen bleibt versteckt
-    if (licScreen) licScreen.style.display = 'none';
-    window.FREE_MODE = false;
-    updateBanner();
-    updateFreischaltenBtn();
-    if (!localStorage.getItem('logta-username')) {
-      setTimeout(()=>showOnboarding(1), 600);
+  try {
+    if (isFullLicense()) {
+      // Vollversion freigeschaltet → License-Screen bleibt versteckt
+      if (licScreen) licScreen.style.display = 'none';
+      window.FREE_MODE = false;
+      updateBanner();
+      updateFreischaltenBtn();
+      let hasUsername = false;
+      try { hasUsername = !!localStorage.getItem('logta-username'); } catch (e) { hasUsername = false; }
+      if (!hasUsername) {
+        setTimeout(()=>showOnboarding(1), 600);
+      }
+    } else {
+      // Nicht freigeschaltet → License-Screen zeigen (überdeckt die App per position:fixed)
+      if (licScreen) licScreen.style.display = 'flex';
     }
-  } else {
-    // Nicht freigeschaltet → License-Screen zeigen (überdeckt die App per position:fixed)
-    if (licScreen) licScreen.style.display = 'flex';
+  } catch (e) {
+    // Sicherheitsnetz: sollte hier etwas unerwartet fehlschlagen, NIE die App
+    // hinter einem dunklen Overlay hängen lassen -> lieber Startseite zeigen
+    // als "schwarzer Bildschirm nach dem Download".
+    if (licScreen) licScreen.style.display = 'none';
+    console.error('Init-Fehler beim Lizenz-Check:', e);
   }
 });
 </script>
