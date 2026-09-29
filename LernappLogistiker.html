@@ -830,94 +830,7 @@
 </head>
 <body>
 
-<!-- ===== LOGIN SCREEN (Apple IAP) ===== -->
-<div id="license-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,#0a1a24 0%,#0f2d3d 60%,#123d4f 100%);flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity 0.4s;overflow-y:auto;">
-  <div style="width:100%;max-width:380px;">
 
-    <!-- Logo & Titel -->
-    <div style="text-align:center;margin-bottom:28px;">
-      <div style="font-family:'Exo 2',sans-serif;font-size:40px;font-weight:900;color:white;letter-spacing:-1px;">
-        <span style="color:#E82020;">Log</span><span style="color:white;">Ta</span>
-      </div>
-      <div style="font-family:'Exo 2',sans-serif;font-size:15px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:2px;margin-top:2px;">LOGISTIKER</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.35);font-weight:500;letter-spacing:1px;margin-top:6px;">Prüfungsvorbereitung</div>
-    </div>
-
-    <!-- Was bekommst du -->
-    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px 20px;margin-bottom:20px;">
-      <div style="font-family:'Exo 2',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:1px;margin-bottom:12px;">VOLLVERSION ENTHÄLT</div>
-      <div style="display:flex;flex-direction:column;gap:9px;">
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.85);">
-          <span style="color:#22c55e;font-size:15px;">✓</span> Alle 12 Lernfelder &amp; Kapitel
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.85);">
-          <span style="color:#22c55e;font-size:15px;">✓</span> Lernkarten mit Erklärungen
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.85);">
-          <span style="color:#22c55e;font-size:15px;">✓</span> Prüfungsfragen mit Quiz
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.85);">
-          <span style="color:#22c55e;font-size:15px;">✓</span> Fortschrittsverfolgung &amp; Statistiken
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.85);">
-          <span style="color:#22c55e;font-size:15px;">✓</span> Einmaliger Kauf · Kein Abo · Für immer
-        </div>
-      </div>
-    </div>
-
-    <!-- Kauf-Karte -->
-    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:24px;">
-
-      <!-- Fehleranzeige IAP -->
-      <div id="iap-error" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px;margin-bottom:14px;font-size:12px;color:#ef4444;text-align:center;"></div>
-
-      <!-- Kaufen Button -->
-      <button id="iap-buy-btn" onclick="iapPurchase()"
-        style="width:100%;background:linear-gradient(135deg,#E82020,#b51818);border:none;border-radius:14px;padding:17px;font-family:'Exo 2',sans-serif;font-size:17px;font-weight:900;color:white;cursor:pointer;letter-spacing:0.3px;transition:opacity 0.2s;margin-bottom:10px;box-shadow:0 4px 24px rgba(232,32,32,0.4);"
-        onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
-        🎓 Jetzt kaufen – <span class="iap-price-label" data-fallback-price="59,99 €">59,99 €</span>
-      </button>
-
-      <!-- Lade-Indikator -->
-      <div id="iap-loading" style="display:none;text-align:center;padding:12px;font-size:13px;color:rgba(255,255,255,0.5);">⏳ Verbinde mit App Store…</div>
-
-      <!-- Trennlinie -->
-      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;">
-        <div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.25);font-weight:600;">ODER</div>
-        <div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div>
-      </div>
-
-      <!-- Kostenlos reinschauen -->
-      <button onclick="openFreeContent()"
-        style="width:100%;background:transparent;border:1.5px solid rgba(255,255,255,0.2);border-radius:14px;padding:14px;font-family:'Exo 2',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);cursor:pointer;letter-spacing:0.3px;transition:all 0.2s;margin-bottom:14px;"
-        onmouseover="this.style.borderColor='rgba(255,255,255,0.5)';this.style.color='white'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='rgba(255,255,255,0.75)'">
-        👀 Kostenlos reinschauen
-      </button>
-
-      <!-- Kauf wiederherstellen (Apple Pflicht) -->
-      <button onclick="iapRestore()"
-        style="width:100%;background:transparent;border:none;padding:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,0.35);cursor:pointer;transition:color 0.2s;"
-        onmouseover="this.style.color='rgba(255,255,255,0.65)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
-        Kauf wiederherstellen
-      </button>
-
-      <!-- Zurück zur App (nur wenn bereits gekauft/Gratis-Bereich) -->
-      <button id="license-back-btn" onclick="closeLicenseScreen()" style="display:none;width:100%;background:transparent;border:1.5px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px;font-family:'Exo 2',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,0.45);cursor:pointer;margin-top:8px;">
-        ← Zurück zur App
-      </button>
-
-    </div>
-
-    <!-- Footer -->
-    <div style="text-align:center;margin-top:18px;font-size:11px;color:rgba(255,255,255,0.2);line-height:1.9;">
-      Fachkraft Lagerlogistik · Prüfungsvorbereitung<br>
-      <span onclick="showPrivacyInfo()" style="cursor:pointer;text-decoration:underline;">Datenschutz</span> &nbsp;·&nbsp;
-      <span onclick="showTermsInfo()" style="cursor:pointer;text-decoration:underline;">Nutzungsbedingungen</span>
-    </div>
-
-  </div>
-</div>
 
 <!-- ===== APP CONTENT (von License-Screen überdeckt wenn nicht gekauft) ===== -->
 
@@ -1045,12 +958,7 @@
       </div>
       Backup
     </div>
-    <div class="nav-item" id="nav-freischalten" style="display:none;">
-      <div class="nav-icon" style="background:rgba(245,158,11,0.18);">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-      </div>
-      <span style="color:#f59e0b;font-weight:600;">Lernapp freischalten</span>
-    </div>
+    
   </div>
 
   <!-- Spacer unten -->
@@ -20330,16 +20238,9 @@ window.setIAPDisplayPrice = setIAPDisplayPrice;
 
 // Prüft ob Vollversion freigeschaltet ist
 function isFullLicense() {
-  // Echte Lizenzprüfung (Kaufscreen ist aktiv).
-  // try/catch: manche WebViews (v.a. bei erstem App-Start ohne Netz-/Storage-Zugriff)
-  // werfen bei localStorage-Zugriff einen Fehler -> ohne Abfangen bliebe die App
-  // an dieser Stelle hängen ("schwarzer Bildschirm" nach dem Download).
-  try {
-    const saved = localStorage.getItem(LICENSE_KEY);
-    return saved === IAP_LICENSE_VALUE || saved === IAP_LICENSE_VALUE_LEGACY;
-  } catch (e) {
-    return false;
-  }
+  // Kein In-App-Kauf mehr: Die App wird beim Download im App Store bezahlt.
+  // Deshalb ist die Vollversion immer und fuer alle freigeschaltet.
+  return true;
 }
 
 // Erkennt, welche native Kauf-Bridge verfügbar ist (iOS-WebView, Android-WebView, oder keine/Browser)
