@@ -111,8 +111,8 @@ jobs:
       - name: Set Version Number
         run: |
           cd ios/App
-          xcrun agvtool new-marketing-version 1.3
-          echo "Version set to 1.0"
+          xcrun agvtool new-marketing-version 1.4.${{ github.run_number }}
+          echo "Version set to 1.4.${{ github.run_number }}"
 
       - name: Set App Icon
         run: |
